@@ -1,0 +1,8 @@
+### Токен приложения VK нужно указать в token.txt
+
+Билиотеки:
+- requests [pip install requests]
+- urlopen [pip install urlopen]
+- tqdm [pip install tqdm]
+- datetime [pip install DateTime]
+- json [pip install jsons]
