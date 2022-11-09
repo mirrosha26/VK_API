@@ -1,4 +1,6 @@
 import requests 
+from pprint import pprint
+import requests
 from urllib.request import urlopen
 from tqdm import tqdm
 from datetime import datetime
@@ -10,16 +12,17 @@ with open('token.txt', 'r') as file_object:
 class VkGet:
     def __init__(self, token: str, id):
         self.token = token
-        self.URL = "https://api.vk.com/method/photos.getAll"
+        self.URL = "https://api.vk.com/method/photos.get"
         self.params = {
                 'access_token': token,
                 'v': '5.131',
-                'photo_sizes': 1,
+                'photo_sizes': True,
                 'album_id' : 'profile',
-                'offset': 0,
                 'owner_id': id,
-                'extended' : 1,
-                'count': '20'
+                'extended' : '1',
+                'skip_hidden': '1',
+                'count': 20,
+                'offset': 0
             }
         print("## Получаем фотографии профиля")
         self.links = self.set()
@@ -91,13 +94,18 @@ class YaUploader:
         return 
 
     def upload_yandex(self, url, y_path):
-        url_upload = self.get_upload_link(y_path).get("href","")
-        response = requests.put(url_upload, data = urlopen(url))
-        response.raise_for_status()
-        if response.status_code == 201:
-            name = y_path.split("/")
-            print(f' файл {name[1]} загружен')
-        return response.json
+        try:
+            url_upload = self.get_upload_link(y_path).get("href","")
+            img = urlopen(url)
+            response = requests.put(url_upload, data = str(img))
+            response.raise_for_status()
+            if response.status_code == 201:
+                name = y_path.split("/")
+                print(f' файл {name[1]} загружен')
+        except:
+                print(" файл не загружен")
+                return False
+        return True
 
     def get_upload_link(self, y_path):
         upload_url = "https://cloud-api.yandex.net/v1/disk/resources/upload"
@@ -113,7 +121,10 @@ class YaUploader:
             print(f'Доступно {len(links)} фотографий для загрузки')
             count = int(input("Сколько фотографий загрузить? "))
         for i in tqdm(links[:count]):
-            self.upload_yandex(i['url'], f"{folder}/{i['name']}")
+            check_upload = self.upload_yandex(i['url'], f"{folder}/{i['name']}")
+            if not check_upload:
+                links.remove(i)
+        return links
         print('\n✅ Загрузка завершена', end="\n-----\n\n")
 
     def data_json(self, links):
@@ -127,13 +138,13 @@ class YaUploader:
 
 
 if __name__ == '__main__':
-    folder_name = "my_photo"
+    folder_name = "folder_vk"
     vk_id = input("Введите id пользователя VK: ")
     yandex_token = input("Введите свой токен с полегона: ")
 
     vk = VkGet(token, vk_id)
-
     disk = YaUploader(yandex_token)
+
     disk.create_folder(folder_name)
-    disk.put_photos(vk.links, folder_name)
-    disk.data_json(vk.links)
+    report = disk.put_photos(vk.links, folder_name)
+    disk.data_json(report)
