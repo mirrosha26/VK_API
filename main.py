@@ -1,6 +1,4 @@
 import requests 
-from pprint import pprint
-import requests
 from urllib.request import urlopen
 from tqdm import tqdm
 from datetime import datetime
