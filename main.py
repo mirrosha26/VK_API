@@ -95,7 +95,7 @@ class YaUploader:
         try:
             url_upload = self.get_upload_link(y_path).get("href","")
             img = urlopen(url)
-            response = requests.put(url_upload, data = str(img))
+            response = requests.put(url_upload, data = img)
             response.raise_for_status()
             if response.status_code == 201:
                 name = y_path.split("/")
