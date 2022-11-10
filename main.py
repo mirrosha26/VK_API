@@ -3,6 +3,8 @@ from urllib.request import urlopen
 from tqdm import tqdm
 from datetime import datetime
 import json
+from PIL import Image
+from urllib.request import urlopen
 
 with open('token.txt', 'r') as file_object:
     token = file_object.read().strip()
@@ -95,8 +97,7 @@ class YaUploader:
         try:
             url_upload = self.get_upload_link(y_path).get("href","")
             img = urlopen(url)
-            response = requests.put(url_upload, data = img)
-            response.raise_for_status()
+            response = requests.put(url_upload,  files={'file':img})
             if response.status_code == 201:
                 name = y_path.split("/")
                 print(f' файл {name[1]} загружен')
