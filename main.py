@@ -3,8 +3,6 @@ from urllib.request import urlopen
 from tqdm import tqdm
 from datetime import datetime
 import json
-from PIL import Image
-from urllib.request import urlopen
 
 with open('token.txt', 'r') as file_object:
     token = file_object.read().strip()
